@@ -21,7 +21,7 @@ const patterns = [
       [[0,1],[1,1],[2,1],[3,1]],
       [[1,0],[1,1],[1,2],[1,3]],
     ],
-    color: 1,
+    imgIndex: 1,
   },
   // T
   {
@@ -31,7 +31,7 @@ const patterns = [
       [[1,1],[0,2],[1,2],[2,2]],
       [[1,0],[1,1],[2,1],[1,2]],
     ],
-    color: 2,
+    imgIndex: 2,
   },
   // L
   {
@@ -41,7 +41,7 @@ const patterns = [
       [[2,1],[0,2],[1,2],[2,2]],
       [[1,0],[1,1],[1,2],[2,2]],
     ],
-    color: 3,
+    imgIndex: 3,
   },
   // J
   {
@@ -51,7 +51,7 @@ const patterns = [
       [[0,1],[0,2],[1,2],[2,2]],
       [[1,0],[2,0],[1,1],[1,2]],
     ],
-    color: 4,
+    imgIndex: 4,
   },
   // S
   {
@@ -61,7 +61,7 @@ const patterns = [
       [[1,1],[2,1],[0,2],[1,2]],
       [[0,0],[0,1],[1,1],[1,2]],
     ],
-    color: 5,
+    imgIndex: 5,
   },
   // Z
   {
@@ -71,7 +71,7 @@ const patterns = [
       [[0,1],[1,1],[1,2],[2,2]],
       [[2,0],[1,1],[2,1],[1,2]],
     ],
-    color: 6,
+    imgIndex: 6,
   },
   {
     blocks: [
@@ -80,7 +80,7 @@ const patterns = [
       [[1,1],[1,2],[2,1],[2,2]],
       [[1,1],[1,2],[2,1],[2,2]],
     ],
-    color: 7,
+    imgIndex: 7,
   },
 ];
 
@@ -143,7 +143,7 @@ function onTimer() {
 }
 
 function onArrowDown() {
-  if (shouldFix()) {
+  if (detectSides()[2]) {
     fix();
     clearLines();
     activeMino = spawn();
@@ -166,13 +166,13 @@ function onArrowUp() {
   draw();
 }
 
-function onArrowRight() {
-  if (!detectSides()[1]) activeMino.pos[0]++;
+function onArrowLeft() {
+  if (!detectSides()[0]) activeMino.pos[0]--;
   draw();
 }
 
-function onArrowLeft() {
-  if (!detectSides()[0]) activeMino.pos[0]--;
+function onArrowRight() {
+  if (!detectSides()[1]) activeMino.pos[0]++;
   draw();
 }
 
@@ -202,13 +202,7 @@ function draw() {
   });
 
   getAbsoluteBlocks().forEach(([x, y]) =>
-    drawBlock(x, y, activeMino.pattern.color)
-  );
-}
-
-function shouldFix() {
-  return getAbsoluteBlocks().some(
-    ([x, y]) => y >= HEIGHT - 1 || (isInGrid(x, y) && field[y + 1][x])
+    drawBlock(x, y, activeMino.pattern.imgIndex)
   );
 }
 
@@ -218,15 +212,17 @@ function isInGrid(x: number, y: number) {
 
 function fix() {
   getAbsoluteBlocks().forEach(([x, y]) => {
-    field[y][x] = activeMino.pattern.color;
+    field[y][x] = activeMino.pattern.imgIndex;
   });
 }
 
+// [left,right, bottom]
 function detectSides() {
   const blocks = getAbsoluteBlocks();
   return [
-    blocks.some(([x, _]) => x - 1 < 0),
-    blocks.some(([x, _]) => x + 1 >= WIDTH),
+    blocks.some(([x, y]) => x - 1 < 0 || field[y][x - 1]),
+    blocks.some(([x, y]) => x + 1 >= WIDTH || field[y][x + 1]),
+    blocks.some(([x, y]) => y + 1 >= HEIGHT || field[y + 1][x]),
   ];
 }
 
