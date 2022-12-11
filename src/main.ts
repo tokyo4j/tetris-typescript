@@ -73,6 +73,7 @@ const patterns = [
     ],
     imgIndex: 6,
   },
+  // O
   {
     blocks: [
       [[1,1],[1,2],[2,1],[2,2]],
@@ -84,7 +85,7 @@ const patterns = [
   },
 ];
 
-let field: number[][] = initField();
+let field = initField();
 
 function initField() {
   return Array.from({ length: HEIGHT }, () =>
@@ -143,7 +144,7 @@ function onTimer() {
 }
 
 function onArrowDown() {
-  if (detectSides()[2]) {
+  if (isTouchingSides()[2]) {
     fix();
     clearLines();
     activeMino = spawn();
@@ -153,9 +154,9 @@ function onArrowDown() {
     }
   } else {
     activeMino.pos[1]++;
-    draw();
     resetTimer();
   }
+  draw();
 }
 
 function onArrowUp() {
@@ -167,12 +168,12 @@ function onArrowUp() {
 }
 
 function onArrowLeft() {
-  if (!detectSides()[0]) activeMino.pos[0]--;
+  if (!isTouchingSides()[0]) activeMino.pos[0]--;
   draw();
 }
 
 function onArrowRight() {
-  if (!detectSides()[1]) activeMino.pos[0]++;
+  if (!isTouchingSides()[1]) activeMino.pos[0]++;
   draw();
 }
 
@@ -217,7 +218,7 @@ function fix() {
 }
 
 // [left,right, bottom]
-function detectSides() {
+function isTouchingSides() {
   const blocks = getAbsoluteBlocks();
   return [
     blocks.some(([x, y]) => x - 1 < 0 || field[y][x - 1]),
